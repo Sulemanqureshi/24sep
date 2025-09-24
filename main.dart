@@ -47,4 +47,5 @@ void main() {
   print("Minimum: ${min ?? 'None'}");
   print("Even numbers: $evenCount");
   print("Odd numbers: $oddCount");
+  print("hello");
 }
