@@ -1,50 +1,59 @@
 import 'dart:io';
+import 'dart:math'; // For square root
 
 void main() {
+  // Prompt for range
+  print("Enter range (start end): ");
+  String? input = stdin.readLineSync();
+  List<String> range = input!.split(' ');
+  
+  // Convert inputs to integers
+  int start = int.parse(range[0]);
+  int end = int.parse(range[1]);
+  
+  // Validate range
+  if (start > end) {
+    print("Start should be less than or equal to end.");
+    return;
+  }
+  
+  // Variables to store results
+  List<int> primes = [];
   int count = 0;
-  int sum = 0;
-  int? max; 
-  int? min;
-  int evenCount = 0; 
-  int oddCount = 0; 
-
-  print("Enter numbers (0 to stop):");
-
-  while (true) {
-    String? input = stdin.readLineSync();
-    int number = int.parse(input!); 
-
-    if (number == 0) {
-      break; 
-    }
-    count++;
-    sum += number;
-
-    if (max == null || number > max) {
-      max = number;
-    }
-    if (min == null || number < min) {
-      min = number; 
-    }
-    if (number % 2 == 0) {
-      evenCount++;
+  int? largestPrime;
+  
+  // Loop through the range
+  for (int num = start; num <= end; num++) {
+    bool isPrime = true;
+    
+    // Skip 1 as it's not prime
+    if (num <= 1) {
+      isPrime = false;
     } else {
-      oddCount++;
+      // Check divisibility up to square root for optimization
+      for (int i = 2; i <= sqrt(num).toInt(); i++) {
+        if (num % i == 0) {
+          isPrime = false;
+          break; // Exit inner loop if not prime
+        }
+      }
+    }
+    
+    // If prime, add to list and update count and largest prime
+    if (isPrime) {
+      primes.add(num);
+      count++;
+      largestPrime = num;
     }
   }
-  print("Analysis Results:");
-  print("Count: $count numbers");
-  print("Sum: $sum");
-
-  if (count > 0) {
-    double average = sum / count;
-    print("Average: $average");
+  
+  // Display results
+  print("Prime numbers between $start and $end:");
+  if (primes.isEmpty) {
+    print("None");
   } else {
-    print("Average: 0");
+    print(primes.join(", ")); // Join primes with commas
   }
-
-  print("Maximum: ${max ?? 'None'}");
-  print("Minimum: ${min ?? 'None'}");
-  print("Even numbers: $evenCount");
-  print("Odd numbers: $oddCount");
+  print("Total prime numbers found: $count");
+  print("Largest prime in range: ${largestPrime ?? 'None'}");
 }
