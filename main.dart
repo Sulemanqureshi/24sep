@@ -1,59 +1,90 @@
+// student_report.dart
 import 'dart:io';
-import 'dart:math'; // For square root
 
 void main() {
-  // Prompt for range
-  print("Enter range (start end): ");
-  String? input = stdin.readLineSync();
-  List<String> range = input!.split(' ');
-  
-  // Convert inputs to integers
-  int start = int.parse(range[0]);
-  int end = int.parse(range[1]);
-  
-  // Validate range
-  if (start > end) {
-    print("Start should be less than or equal to end.");
-    return;
-  }
-  
-  // Variables to store results
-  List<int> primes = [];
-  int count = 0;
-  int? largestPrime;
-  
-  // Loop through the range
-  for (int num = start; num <= end; num++) {
-    bool isPrime = true;
-    
-    // Skip 1 as it's not prime
-    if (num <= 1) {
-      isPrime = false;
-    } else {
-      // Check divisibility up to square root for optimization
-      for (int i = 2; i <= sqrt(num).toInt(); i++) {
-        if (num % i == 0) {
-          isPrime = false;
-          break; // Exit inner loop if not prime
-        }
-      }
+  print("=== Student Report System ===");
+  List<Map<String, dynamic>> students = [];
+
+  // Read student data
+  print("Enter student data (name,subject1:mark1,subject2:mark2,...), press Enter twice to stop:");
+  while (true) {
+    String? input = stdin.readLineSync();
+    if (input == null || input.isEmpty) break;
+
+    List<String> parts = input.split(',');
+    String name = parts[0].trim();
+    Map<String, double> subjects = {};
+
+    // Process subjects and marks
+    for (int i = 1; i < parts.length; i++) {
+      List<String> subjectMark = parts[i].split(':');
+      String subject = subjectMark[0].trim();
+      double mark = double.parse(subjectMark[1].trim());
+      subjects[subject] = mark;
     }
-    
-    // If prime, add to list and update count and largest prime
-    if (isPrime) {
-      primes.add(num);
-      count++;
-      largestPrime = num;
+
+    students.add({'name': name, 'subjects': subjects});
+  }
+
+  // Process each student
+  print("");
+  double classTotalAverage = 0;
+  int passCount = 0;
+  String? highestScorer;
+  double highestAverage = 0;
+  Set<String> allSubjects = {};
+
+  for (var student in students) {
+    String name = student['name'];
+    Map<String, double> subjects = student['subjects'];
+    double total = 0;
+    int subjectCount = subjects.length;
+
+    // Calculate average
+    subjects.forEach((subject, mark) {
+      total += mark;
+      allSubjects.add(subject);
+    });
+    double average = total / subjectCount;
+
+    // Update class statistics
+    classTotalAverage += average;
+    if (average >= 60) passCount++;
+    if (average > highestAverage) {
+      highestAverage = average;
+      highestScorer = name;
     }
+
+    // Calculate overall grade
+    String grade = calculateGrade(average);
+
+    // Generate student report
+    print("Student: $name");
+    print("Subjects: ${subjects.entries.map((e) => "${e.key} (${e.value})").join(", ")}");
+    print("Average: ${average.toStringAsFixed(1)}");
+    print("Grade: $grade");
+    print("Status: ${average >= 60 ? 'Pass' : 'Fail'}");
+    print("");
   }
-  
-  // Display results
-  print("Prime numbers between $start and $end:");
-  if (primes.isEmpty) {
-    print("None");
-  } else {
-    print(primes.join(", ")); // Join primes with commas
-  }
-  print("Total prime numbers found: $count");
-  print("Largest prime in range: ${largestPrime ?? 'None'}");
+
+  // Generate class summary
+  int totalStudents = students.length;
+  double classAverage = totalStudents > 0 ? classTotalAverage / totalStudents : 0;
+  double passRate = totalStudents > 0 ? (passCount / totalStudents) * 100 : 0;
+
+  print("Class Summary:");
+  print("Total Students: $totalStudents");
+  print("Class Average: ${classAverage.toStringAsFixed(1)}");
+  print("Highest Scorer: ${highestScorer ?? 'None'} (${highestAverage.toStringAsFixed(1)})");
+  print("Subjects taught: ${allSubjects.length}");
+  print("Pass Rate: ${passRate.toStringAsFixed(0)}%");
+}
+
+// Function to calculate grade based on average
+String calculateGrade(double average) {
+  if (average >= 90) return 'A';
+  if (average >= 80) return 'B';
+  if (average >= 70) return 'C';
+  if (average >= 60) return 'D';
+  return 'F';
 }
