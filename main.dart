@@ -1,48 +1,60 @@
+// number_analysis.dart
 import 'dart:io';
 
 void main() {
-  int count = 0;
-  int sum = 0;
-  int? max; 
-  int? min;
-  int evenCount = 0; 
-  int oddCount = 0; 
-
   print("Enter numbers (0 to stop):");
-
+  
+  // Initialize a List to store numbers
+  List<int> numbers = [];
+  
+  // Read numbers until 0 is entered
   while (true) {
     String? input = stdin.readLineSync();
-    int number = int.parse(input!); 
-
+    int number = int.parse(input!);
+    
     if (number == 0) {
-      break; 
+      break; // Exit loop when 0 is entered
     }
-    count++;
-    sum += number;
-
+    
+    numbers.add(number); // Add number to List
+  }
+  
+  // Initialize variables for analysis
+  int count = numbers.length;
+  int sum = 0;
+  int? max;
+  int? min;
+  int evenCount = 0;
+  int oddCount = 0;
+  
+  // Process numbers in the List
+  for (int number in numbers) {
+    sum += number; // Calculate sum
+    
+    // Update max and min
     if (max == null || number > max) {
       max = number;
     }
     if (min == null || number < min) {
-      min = number; 
+      min = number;
     }
+    
+    // Count even and odd numbers
     if (number % 2 == 0) {
       evenCount++;
     } else {
       oddCount++;
     }
   }
+  
+  // Calculate average
+  double average = count > 0 ? sum / count : 0;
+  
+  // Display results
   print("Analysis Results:");
   print("Count: $count numbers");
   print("Sum: $sum");
-
-  if (count > 0) {
-    double average = sum / count;
-    print("Average: $average");
-  } else {
-    print("Average: 0");
-  }
-
+  print("Average: ${average.toStringAsFixed(1)}");
   print("Maximum: ${max ?? 'None'}");
   print("Minimum: ${min ?? 'None'}");
   print("Even numbers: $evenCount");
