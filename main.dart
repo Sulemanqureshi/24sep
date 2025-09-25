@@ -1,50 +1,66 @@
+// text_analysis.dart
 import 'dart:io';
 
 void main() {
-  int count = 0;
-  int sum = 0;
-  int? max; 
-  int? min;
-  int evenCount = 0; 
-  int oddCount = 0; 
+  // Prompt for text input
+  print("Enter text: ");
+  String? input = stdin.readLineSync();
 
-  print("Enter numbers (0 to stop):");
+  // Check for empty input
+  if (input == null || input.isEmpty) {
+    print("No text entered.");
+    return;
+  }
 
-  while (true) {
-    String? input = stdin.readLineSync();
-    int number = int.parse(input!); 
+  // Initialize collections
+  List<String> words = input.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+  List<String> sentences = input.split(RegExp(r'[.!?]+')).where((s) => s.trim().isNotEmpty).toList();
+  Map<String, int> wordFreq = {};
+  Map<String, int> charFreq = {};
+  Set<String> uniqueWords = {};
 
-    if (number == 0) {
-      break; 
+  // Character count (including spaces)
+  int charCount = input.length;
+
+  // Word frequency and unique words (case-insensitive)
+  for (String word in words) {
+    String lowerWord = word.toLowerCase();
+    wordFreq[lowerWord] = (wordFreq[lowerWord] ?? 0) + 1;
+    uniqueWords.add(lowerWord);
+  }
+
+  // Find most frequent word
+  String mostFrequentWord = "";
+  int maxFreq = 0;
+  wordFreq.forEach((word, freq) {
+    if (freq > maxFreq) {
+      mostFrequentWord = word;
+      maxFreq = freq;
     }
-    count++;
-    sum += number;
+  });
 
-    if (max == null || number > max) {
-      max = number;
-    }
-    if (min == null || number < min) {
-      min = number; 
-    }
-    if (number % 2 == 0) {
-      evenCount++;
-    } else {
-      oddCount++;
+  // Vowel and consonant count
+  int vowelCount = 0;
+  int consonantCount = 0;
+  String vowels = 'aeiou';
+  for (int i = 0; i < input.length; i++) {
+    String char = input[i].toLowerCase();
+    if (RegExp(r'[a-z]').hasMatch(char)) {
+      if (vowels.contains(char)) {
+        vowelCount++;
+      } else {
+        consonantCount++;
+      }
+      charFreq[char] = (charFreq[char] ?? 0) + 1;
     }
   }
+
+  // Output results
   print("Analysis Results:");
-  print("Count: $count numbers");
-  print("Sum: $sum");
-
-  if (count > 0) {
-    double average = sum / count;
-    print("Average: $average");
-  } else {
-    print("Average: 0");
-  }
-
-  print("Maximum: ${max ?? 'None'}");
-  print("Minimum: ${min ?? 'None'}");
-  print("Even numbers: $evenCount");
-  print("Odd numbers: $oddCount");
+  print("Characters: $charCount (including spaces)");
+  print("Words: ${words.length}");
+  print("Sentences: ${sentences.length}");
+  print("Most frequent word: \"$mostFrequentWord\" (appears $maxFreq times)");
+  print("Vowels: $vowelCount, Consonants: $consonantCount");
+  print("Unique words: ${uniqueWords.length}");
 }
